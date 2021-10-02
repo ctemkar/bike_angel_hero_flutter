@@ -1,12 +1,8 @@
-// @dart=2.9
-
 // To parse this JSON data, do
 //
 //     final bikeStations = bikeStationsFromJson(jsonString);
 
 import 'dart:convert';
-
-import 'package:meta/meta.dart';
 
 BikeStations bikeStationsFromJson(String str) =>
     BikeStations.fromJson(json.decode(str));
@@ -15,12 +11,12 @@ String bikeStationsToJson(BikeStations data) => json.encode(data.toJson());
 
 class BikeStations {
   BikeStations({
-    @required this.type,
-    @required this.features,
+    required this.type,
+    required this.features,
   });
 
-  final String type;
-  final List<Feature> features;
+  final String? type;
+  final List<Feature>? features;
 
   factory BikeStations.fromJson(Map<String, dynamic> json) => BikeStations(
         type: json["type"] == null ? null : json["type"],
@@ -34,20 +30,20 @@ class BikeStations {
         "type": type == null ? null : type,
         "features": features == null
             ? null
-            : List<dynamic>.from(features.map((x) => x.toJson())),
+            : List<dynamic>.from(features!.map((x) => x.toJson())),
       };
 }
 
 class Feature {
   Feature({
-    @required this.type,
-    @required this.geometry,
-    @required this.properties,
+    required this.type,
+    required this.geometry,
+    required this.properties,
   });
 
-  final FeatureType type;
-  final Geometry geometry;
-  final Properties properties;
+  final FeatureType? type;
+  final Geometry? geometry;
+  final Properties? properties;
 
   factory Feature.fromJson(Map<String, dynamic> json) => Feature(
         type: json["type"] == null ? null : featureTypeValues.map[json["type"]],
@@ -60,20 +56,20 @@ class Feature {
       );
 
   Map<String, dynamic> toJson() => {
-        "type": type == null ? null : featureTypeValues.reverse[type],
-        "geometry": geometry == null ? null : geometry.toJson(),
-        "properties": properties == null ? null : properties.toJson(),
+        "type": type == null ? null : featureTypeValues.reverse![type!],
+        "geometry": geometry == null ? null : geometry!.toJson(),
+        "properties": properties == null ? null : properties!.toJson(),
       };
 }
 
 class Geometry {
   Geometry({
-    @required this.type,
-    @required this.coordinates,
+    required this.type,
+    required this.coordinates,
   });
 
-  final GeometryType type;
-  final List<double> coordinates;
+  final GeometryType? type;
+  final List<double>? coordinates;
 
   factory Geometry.fromJson(Map<String, dynamic> json) => Geometry(
         type:
@@ -84,10 +80,10 @@ class Geometry {
       );
 
   Map<String, dynamic> toJson() => {
-        "type": type == null ? null : geometryTypeValues.reverse[type],
+        "type": type == null ? null : geometryTypeValues.reverse![type!],
         "coordinates": coordinates == null
             ? null
-            : List<dynamic>.from(coordinates.map((x) => x)),
+            : List<dynamic>.from(coordinates!.map((x) => x)),
       };
 }
 
@@ -97,68 +93,68 @@ final geometryTypeValues = EnumValues({"Point": GeometryType.POINT});
 
 class Properties {
   Properties({
-    @required this.stationId,
-    @required this.name,
-    @required this.terminal,
-    @required this.capacity,
-    @required this.bikesAvailable,
-    @required this.docksAvailable,
-    @required this.bikesDisabled,
-    @required this.docksDisabled,
-    @required this.renting,
-    @required this.returning,
-    @required this.ebikeSurchargeWaiver,
-    @required this.installed,
-    @required this.lastReported,
-    @required this.iconPinBikeLayer,
-    @required this.iconPinDockLayer,
-    @required this.iconDotBikeLayer,
-    @required this.iconDotDockLayer,
-    @required this.bikeAngelsAction,
-    @required this.bikeAngelsPoints,
-    @required this.bikeAngelsDigits,
-    @required this.valetStatus,
-    @required this.ebikesAvailable,
-    @required this.ebikes,
-    @required this.sponsorName,
-    @required this.sponsorImageUrl,
-    @required this.sponsorLinkOutUrl,
-    @required this.valetSummary,
-    @required this.valetDescription,
-    @required this.valetSchedule,
-    @required this.valetLink,
+    required this.stationId,
+    required this.name,
+    required this.terminal,
+    required this.capacity,
+    required this.bikesAvailable,
+    required this.docksAvailable,
+    required this.bikesDisabled,
+    required this.docksDisabled,
+    required this.renting,
+    required this.returning,
+    required this.ebikeSurchargeWaiver,
+    required this.installed,
+    required this.lastReported,
+    required this.iconPinBikeLayer,
+    required this.iconPinDockLayer,
+    required this.iconDotBikeLayer,
+    required this.iconDotDockLayer,
+    required this.bikeAngelsAction,
+    required this.bikeAngelsPoints,
+    required this.bikeAngelsDigits,
+    required this.valetStatus,
+    required this.ebikesAvailable,
+    required this.ebikes,
+    required this.sponsorName,
+    required this.sponsorImageUrl,
+    required this.sponsorLinkOutUrl,
+    required this.valetSummary,
+    required this.valetDescription,
+    required this.valetSchedule,
+    required this.valetLink,
   });
 
-  final String stationId;
-  final String name;
-  final String terminal;
-  final int capacity;
-  final int bikesAvailable;
-  final int docksAvailable;
-  final int bikesDisabled;
-  final int docksDisabled;
-  final bool renting;
-  final bool returning;
-  final bool ebikeSurchargeWaiver;
-  final bool installed;
-  final int lastReported;
-  final IconPinBikeLayer iconPinBikeLayer;
-  final IconPinDockLayer iconPinDockLayer;
-  final IconDotLayer iconDotBikeLayer;
-  final IconDotLayer iconDotDockLayer;
-  final BikeAngelsAction bikeAngelsAction;
-  final int bikeAngelsPoints;
-  final int bikeAngelsDigits;
-  final ValetStatus valetStatus;
-  final int ebikesAvailable;
-  final List<Ebike> ebikes;
-  final SponsorName sponsorName;
-  final String sponsorImageUrl;
-  final String sponsorLinkOutUrl;
-  final ValetSummary valetSummary;
-  final String valetDescription;
-  final String valetSchedule;
-  final String valetLink;
+  final String? stationId;
+  final String? name;
+  final String? terminal;
+  final int? capacity;
+  final int? bikesAvailable;
+  final int? docksAvailable;
+  final int? bikesDisabled;
+  final int? docksDisabled;
+  final bool? renting;
+  final bool? returning;
+  final bool? ebikeSurchargeWaiver;
+  final bool? installed;
+  final int? lastReported;
+  final IconPinBikeLayer? iconPinBikeLayer;
+  final IconPinDockLayer? iconPinDockLayer;
+  final IconDotLayer? iconDotBikeLayer;
+  final IconDotLayer? iconDotDockLayer;
+  final BikeAngelsAction? bikeAngelsAction;
+  final int? bikeAngelsPoints;
+  final int? bikeAngelsDigits;
+  final ValetStatus? valetStatus;
+  final int? ebikesAvailable;
+  final List<Ebike>? ebikes;
+  final SponsorName? sponsorName;
+  final String? sponsorImageUrl;
+  final String? sponsorLinkOutUrl;
+  final ValetSummary? valetSummary;
+  final String? valetDescription;
+  final String? valetSchedule;
+  final String? valetLink;
 
   factory Properties.fromJson(Map<String, dynamic> json) => Properties(
         stationId: json["station_id"] == null ? null : json["station_id"],
@@ -247,37 +243,39 @@ class Properties {
         "last_reported": lastReported == null ? null : lastReported,
         "icon_pin_bike_layer": iconPinBikeLayer == null
             ? null
-            : iconPinBikeLayerValues.reverse[iconPinBikeLayer],
+            : iconPinBikeLayerValues.reverse![iconPinBikeLayer!],
         "icon_pin_dock_layer": iconPinDockLayer == null
             ? null
-            : iconPinDockLayerValues.reverse[iconPinDockLayer],
+            : iconPinDockLayerValues.reverse![iconPinDockLayer!],
         "icon_dot_bike_layer": iconDotBikeLayer == null
             ? null
-            : iconDotLayerValues.reverse[iconDotBikeLayer],
+            : iconDotLayerValues.reverse![iconDotBikeLayer!],
         "icon_dot_dock_layer": iconDotDockLayer == null
             ? null
-            : iconDotLayerValues.reverse[iconDotDockLayer],
+            : iconDotLayerValues.reverse![iconDotDockLayer!],
         "bike_angels_action": bikeAngelsAction == null
             ? null
-            : bikeAngelsActionValues.reverse[bikeAngelsAction],
+            : bikeAngelsActionValues.reverse![bikeAngelsAction!],
         "bike_angels_points":
             bikeAngelsPoints == null ? null : bikeAngelsPoints,
         "bike_angels_digits":
             bikeAngelsDigits == null ? null : bikeAngelsDigits,
-        "valet_status":
-            valetStatus == null ? null : valetStatusValues.reverse[valetStatus],
+        "valet_status": valetStatus == null
+            ? null
+            : valetStatusValues.reverse![valetStatus!],
         "ebikes_available": ebikesAvailable == null ? null : ebikesAvailable,
         "ebikes": ebikes == null
             ? null
-            : List<dynamic>.from(ebikes.map((x) => x.toJson())),
-        "sponsor_name":
-            sponsorName == null ? null : sponsorNameValues.reverse[sponsorName],
+            : List<dynamic>.from(ebikes!.map((x) => x.toJson())),
+        "sponsor_name": sponsorName == null
+            ? null
+            : sponsorNameValues.reverse![sponsorName!],
         "sponsor_image_url": sponsorImageUrl == null ? null : sponsorImageUrl,
         "sponsor_link_out_url":
             sponsorLinkOutUrl == null ? null : sponsorLinkOutUrl,
         "valet_summary": valetSummary == null
             ? null
-            : valetSummaryValues.reverse[valetSummary],
+            : valetSummaryValues.reverse![valetSummary!],
         "valet_description": valetDescription == null ? null : valetDescription,
         "valet_schedule": valetSchedule == null ? null : valetSchedule,
         "valet_link": valetLink == null ? null : valetLink,
@@ -294,12 +292,12 @@ final bikeAngelsActionValues = EnumValues({
 
 class Ebike {
   Ebike({
-    @required this.bikeNumber,
-    @required this.charge,
+    required this.bikeNumber,
+    required this.charge,
   });
 
-  final String bikeNumber;
-  final int charge;
+  final String? bikeNumber;
+  final int? charge;
 
   factory Ebike.fromJson(Map<String, dynamic> json) => Ebike(
         bikeNumber: json["bike_number"] == null ? null : json["bike_number"],
@@ -382,11 +380,11 @@ final featureTypeValues = EnumValues({"Feature": FeatureType.FEATURE});
 
 class EnumValues<T> {
   Map<String, T> map;
-  Map<T, String> reverseMap;
+  Map<T, String>? reverseMap;
 
   EnumValues(this.map);
 
-  Map<T, String> get reverse {
+  Map<T, String>? get reverse {
     if (reverseMap == null) {
       reverseMap = map.map((k, v) => new MapEntry(v, k));
     }

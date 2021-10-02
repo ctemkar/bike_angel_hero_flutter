@@ -1,5 +1,4 @@
-// @dart=2.9
-
+import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -15,7 +14,7 @@ class MarkerGenerator {
   MarkerGenerator(this.markerWidgets, this.callback);
 
   void generate(BuildContext context) {
-    WidgetsBinding.instance
+    WidgetsBinding.instance!
         .addPostFrameCallback((_) => afterFirstLayout(context));
   }
 
@@ -24,9 +23,9 @@ class MarkerGenerator {
   }
 
   void addOverlay(BuildContext context) {
-    OverlayState overlayState = Overlay.of(context);
+    OverlayState overlayState = Overlay.of(context)!;
 
-    OverlayEntry entry;
+    late OverlayEntry entry;
     entry = OverlayEntry(
         builder: (context) {
           return _MarkerHelper(
@@ -58,10 +57,10 @@ class MarkerGenerator {
 /// 2) After painted access the repaint boundary with global key and converts it to uInt8List
 /// 3) Returns set of Uint8List (bitmaps) through callback
 class _MarkerHelper extends StatefulWidget {
-  final List<Widget> markerWidgets;
-  final Function(List<Uint8List>) callback;
+  final List<Widget>? markerWidgets;
+  final Function(List<Uint8List>)? callback;
 
-  const _MarkerHelper({Key key, this.markerWidgets, this.callback})
+  const _MarkerHelper({Key? key, this.markerWidgets, this.callback})
       : super(key: key);
 
   @override
@@ -74,7 +73,7 @@ class _MarkerHelperState extends State<_MarkerHelper> with AfterLayoutMixin {
   @override
   void afterFirstLayout(BuildContext context) {
     _getBitmaps(context).then((list) {
-      widget.callback(list);
+      widget.callback!(list);
     });
   }
 
@@ -85,7 +84,7 @@ class _MarkerHelperState extends State<_MarkerHelper> with AfterLayoutMixin {
       child: Material(
         type: MaterialType.transparency,
         child: Stack(
-          children: widget.markerWidgets.map((i) {
+          children: widget.markerWidgets!.map((i) {
             final markerKey = GlobalKey();
             globalKeys.add(markerKey);
             return RepaintBoundary(
@@ -105,9 +104,10 @@ class _MarkerHelperState extends State<_MarkerHelper> with AfterLayoutMixin {
 
   Future<Uint8List> _getUint8List(GlobalKey markerKey) async {
     RenderRepaintBoundary boundary =
-        markerKey.currentContext.findRenderObject();
+        markerKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     var image = await boundary.toImage(pixelRatio: 2.0);
-    ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    ByteData byteData = await (image.toByteData(format: ui.ImageByteFormat.png)
+        as FutureOr<ByteData>);
     return byteData.buffer.asUint8List();
   }
 }
@@ -117,7 +117,7 @@ mixin AfterLayoutMixin<T extends StatefulWidget> on State<T> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
+    WidgetsBinding.instance!
         .addPostFrameCallback((_) => afterFirstLayout(context));
   }
 
