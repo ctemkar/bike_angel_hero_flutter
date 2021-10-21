@@ -391,3 +391,5 @@ class EnumValues<T> {
     return reverseMap;
   }
 }
+
+// {"type": "Point", "coordinates": [-73.99392888, 40.76727216]}, "properties": {"bike_angels": {"score": 4}, "station": {"id": "72", "id_public": "66db237e-0aca-11e7-82f6-3863bb44ef7c", "name": "W 52 St & 11 Ave", "terminal": "6926.01", "installed": true, "last_reported": 1633218825, "ebike_surcharge_waiver": false, "accepts_dockable_bikes": true, "accepts_lockable_bikes": false, "capacity": 55, "bikes_available": 6, "docks_available": 49, "bikes_disabled": 0, "docks_disabled": 0, "renting": true, "returning": true}, "bikes": [], "icon_pin_bike_layer": "pin-bike-yellow", "icon_pin_dock_layer": "pin-dock-green-most", "icon_dot_bike_layer": "dot-yellow", "icon_dot_dock_layer": "dot-green", "bike_angels_action": "give", "bike_angels_points": 4, "bike_angels_digits": 1}}

@@ -5,6 +5,7 @@ import 'package:bike_angel_hero/model/bikeangelmodel.dart';
 import 'package:bike_angel_hero/services/bikestations.dart';
 import 'package:bike_angel_hero/services/location.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class ShowMap extends StatefulWidget {
@@ -30,7 +31,6 @@ class _ShowMapState extends State<ShowMap> {
 
   Future<void> _onMapCreated(GoogleMapController _cntlr) async {
     _controller = _cntlr;
-    LatLngBounds latLngBounds = await _controller.getVisibleRegion();
 
 //    getLocationData(latLngBounds);
   }
@@ -50,7 +50,7 @@ class _ShowMapState extends State<ShowMap> {
 
     var stationList = bikeStations.features;
     final Uint8List markerIcon = await getBytesFromCanvas(
-        200, 100, 'placeholder', Colors.black26, Colors.white, false);
+        200, 200, 0, Colors.black26, Colors.white, false);
 
     _markers.clear();
     // _markers.add(marker);
@@ -74,6 +74,7 @@ class _ShowMapState extends State<ShowMap> {
       // station.geometry.coordinates[0]))
       {
         textColor = Colors.white;
+        color = Colors.black54;
 
         switch (bikeAngelPoints) {
           case 4:
@@ -134,8 +135,8 @@ class _ShowMapState extends State<ShowMap> {
             }
             break;
         }
-        final Uint8List markerIcon = await getBytesFromCanvas(200, 100,
-            bikeAngelPoints.toString(), color, textColor, hasBigPoints);
+        final Uint8List markerIcon = await getBytesFromCanvas(
+            200, 100, bikeAngelPoints, color, textColor, hasBigPoints);
         myIcon = BitmapDescriptor.fromBytes(markerIcon);
 
         final marker = Marker(
@@ -165,37 +166,84 @@ class _ShowMapState extends State<ShowMap> {
     return false;
   }
 
-  Future<Uint8List> getBytesFromCanvas(int width, int height, String title,
-      Color color, Color textColor, bool hasBigPoints) async {
+  Future<Uint8List> getBytesFromCanvas(
+      int width,
+      int height,
+      int bikeAngelPoints,
+      Color color,
+      Color textColor,
+      bool hasBigPoints) async {
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
     final Paint paint = Paint()..color = color;
-    final Radius radius = Radius.circular(10.0);
-    width = 75;
-    height = 50;
+    final Radius radius = Radius.circular(5.0);
+    // width = 150;
+    // height = 150;
+    const textFontSize = 35.0;
+    int arrowCodePoint;
+
+    var zoomLevel = await _controller.getZoomLevel();
+    width = (zoomLevel * 7).toInt();
+    height = (width / 2).toInt();
+    TextStyle textStyleOut = TextStyle(
+        fontSize: textFontSize,
+        color: textColor,
+        fontFamily: FontAwesomeIcons.solidArrowAltCircleUp.fontFamily,
+        package: FontAwesomeIcons.solidArrowAltCircleUp.fontPackage);
+
+    TextStyle textStyle0 = TextStyle(
+        fontSize: textFontSize,
+        color: textColor,
+        fontFamily: FontAwesomeIcons.dotCircle.fontFamily,
+        package: FontAwesomeIcons.dotCircle.fontPackage);
+    TextStyle textStyleIn = TextStyle(
+        fontSize: textFontSize,
+        color: textColor,
+        fontFamily: FontAwesomeIcons.solidArrowAltCircleDown.fontFamily,
+        package: FontAwesomeIcons.solidArrowAltCircleDown.fontPackage);
+    TextStyle selTextStyle;
+    selTextStyle = textStyle0;
+    arrowCodePoint = FontAwesomeIcons.dotCircle.codePoint;
+    if (bikeAngelPoints > 0) {
+      selTextStyle = textStyleOut;
+      arrowCodePoint = FontAwesomeIcons.solidArrowAltCircleUp.codePoint;
+    } else if (bikeAngelPoints < 0) {
+      selTextStyle = textStyleIn;
+      arrowCodePoint = FontAwesomeIcons.solidArrowAltCircleDown.codePoint;
+    }
+
+    /*
     if (hasBigPoints) {
       canvas.drawOval(
           Rect.fromLTWH(
               0.0, 0.0, width.toDouble() * 1.25, width.toDouble() * 1.25),
           paint);
     } else {
-      canvas.drawRRect(
-          RRect.fromRectAndCorners(
-            Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
-            topLeft: radius,
-            topRight: radius,
-            bottomLeft: radius,
-            bottomRight: radius,
-          ),
-          paint);
-    }
+*/
+    canvas.drawRRect(
+        RRect.fromRectAndCorners(
+          Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
+          topLeft: radius,
+          topRight: radius,
+          bottomLeft: radius,
+          bottomRight: radius,
+        ),
+        paint);
+    // }
 
     TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
     painter.text = TextSpan(
+      text: String.fromCharCode(arrowCodePoint) + bikeAngelPoints.toString(),
+      style: selTextStyle,
+    );
+
+/*
+    painter.text = TextSpan(
       text: title,
       style: TextStyle(
-          fontSize: 35.0, color: textColor, fontWeight: FontWeight.bold),
+          fontSize: 55.0, color: textColor, fontWeight: FontWeight.bold),
     );
+    */
     painter.layout();
     painter.paint(
         canvas,
@@ -203,7 +251,7 @@ class _ShowMapState extends State<ShowMap> {
             (height * 0.5) - painter.height * 0.5));
     final img = await pictureRecorder
         .endRecording()
-        .toImage((width * 1.5).toInt(), (height * 1.5).toInt());
+        .toImage((width).toInt(), (height).toInt());
     final data = await img.toByteData(format: ImageByteFormat.png);
     return data!.buffer.asUint8List();
   }
