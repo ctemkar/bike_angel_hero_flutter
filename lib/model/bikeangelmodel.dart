@@ -6,7 +6,9 @@ import 'package:http/http.dart' as http;
 
 const bikeAngelStationsDataURL =
     'https://layer.bicyclesharing.net/map/v1/nyc/stations';
-const combosURL = "http://192.168.1.123:5000/getappcombos"; // Testing
+// const combosURL = "http://192.168.1.123:5000/getappcombos"; // Testing
+const combosURL =
+    "https://bike-angel-hero-server.herokuapp.com/getappcombos"; // Production
 
 class BikeAngelModel {
   Future<BikeStations> fetchBikeStations(http.Client client) async {
@@ -26,14 +28,14 @@ class BikeAngelModel {
     try {
       final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
 
-      var result = parsed
-          .map<BikeStations>((json) => BikeStations.fromJson(json))
-          .toList();
+      // var result = parsed
+      //     .map<BikeStations>((json) => BikeStations.fromJson(json))
+      //     .toList();
       return parsed
           .map<BikeStations>((json) => BikeStations.fromJson(json))
           .toList();
     } catch (e) {
-      print(e.toString());
+      // print(e.toString());
       return List.empty();
     }
   }

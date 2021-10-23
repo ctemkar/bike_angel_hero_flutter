@@ -54,8 +54,8 @@ class _ShowMapState extends State<ShowMap> {
 
     _markers.clear();
     // _markers.add(marker);
-    var color;
-    var textColor;
+    Color color;
+    Color textColor;
     bool hasBigPoints;
     myIcon = BitmapDescriptor.fromBytes(markerIcon);
 
@@ -63,7 +63,7 @@ class _ShowMapState extends State<ShowMap> {
       hasBigPoints = false;
       var bikeAngelsAction = station.properties.bikeAngelsAction;
       var bikeAngelPoints = station.properties.bikeAngelsPoints;
-      if (bikeAngelsAction == BikeAngelsAction.GIVE) {
+      if (bikeAngelsAction == BikeAngelsAction.give) {
         bikeAngelPoints = -bikeAngelPoints;
       }
       double lat = station.geometry.coordinates[1];
@@ -176,7 +176,7 @@ class _ShowMapState extends State<ShowMap> {
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
     final Paint paint = Paint()..color = color;
-    final Radius radius = Radius.circular(5.0);
+    const Radius radius = Radius.circular(5.0);
     // width = 150;
     // height = 150;
     const textFontSize = 35.0;
@@ -184,7 +184,7 @@ class _ShowMapState extends State<ShowMap> {
 
     var zoomLevel = await _controller.getZoomLevel();
     width = (zoomLevel * 7).toInt();
-    height = (width / 2).toInt();
+    height = width ~/ 2;
     TextStyle textStyleOut = TextStyle(
         fontSize: textFontSize,
         color: textColor,
