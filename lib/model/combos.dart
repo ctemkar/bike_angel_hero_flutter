@@ -5,8 +5,12 @@ import 'dart:math';
 import 'package:bike_angel_hero/services/location.dart';
 import 'package:bike_angel_hero/services/networking.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 const nearDistance = 2; // 2 km
+const combosURL = 'http://192.168.1.123:5000/getappcombos'; // testing
+// const combosURL =
+//    "https://bike-angel-hero-server.herokuapp.com/getappcombos"; // Production
 
 class Combo {
   late final int points;
@@ -33,36 +37,81 @@ class Combo {
   }
 }
 
-class CombosListView extends StatelessWidget {
-  const CombosListView({Key? key}) : super(key: key);
+class ComboListPage extends StatefulWidget {
+  const ComboListPage({Key? key}) : super(key: key);
 
-  /*
+  @override
+  _ComboListPageState createState() => _ComboListPageState();
+}
+
+class _ComboListPageState extends State<ComboListPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Combo>>(
-      future: _fetchCombos(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          List<Combo>? data = snapshot.data;
-          return _combosListView(data);
-        } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
-        }
-        return CircularProgressIndicator();
-      },
-    );
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("At: " + DateFormat('kk:mm:ss').format(DateTime.now())),
+          leading: GestureDetector(
+            onTap: () {
+              setState(() {});
+            },
+            child: Icon(
+              Icons.menu, // add custom icons also
+            ),
+          ),
+          actions: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Icon(
+                    Icons.search,
+                    size: 26.0,
+                  ),
+                )),
+            Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Icon(Icons.more_vert),
+                )),
+          ],
+        ),
+        body: FutureBuilder<List<Combo>>(
+          future: _fetchCombos(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<Combo>? data = snapshot.data;
+              //createListView(context, snapshot);
+              return RefreshIndicator(
+                child: _combosListView(data),
+                onRefresh: _fetchCombosWithStateRefresh,
+              );
+              // return _combosListView(data);
+            } else if (snapshot.hasError) {
+              return Text("${snapshot.error}");
+            }
+            return const CircularProgressIndicator();
+          },
+        ));
   }
-  */
 
+  Future<List<Combo>> _fetchCombosWithStateRefresh() {
+    return _fetchCombos();
+  }
+
+  String formattedDate = '';
   Future<List<Combo>> _fetchCombos() async {
-    // const combosURL = 'http://192.168.1.123:5000/getappcombos'; // testing
-    const combosURL =
-        "https://bike-angel-hero-server.herokuapp.com/getappcombos"; // Production
     MyLocation location = MyLocation();
     await location.getCurrentLocation();
     NetworkHelper networkHelper = NetworkHelper(combosURL);
+    DateTime now = DateTime.now();
+    formattedDate = DateFormat('kk:mm:ss \n EEE d MMM').format(now);
     final response = await networkHelper.getData();
-    List tobeDisplayed = [];
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
 
@@ -70,9 +119,9 @@ class CombosListView extends StatelessWidget {
         var element = jsonResponse[i];
         final distanceInMeters = calculateDistance(element['latitude'],
             element['longitude'], location.latitude, location.longitude);
-        print(distanceInMeters);
+        // print(distanceInMeters);
         if (distanceInMeters > nearDistance) {
-          jsonResponse.removeAt(i);
+          //     jsonResponse.removeAt(i);
         }
       }
 
@@ -89,7 +138,7 @@ class CombosListView extends StatelessWidget {
         c((lat2 - lat1) * p) / 2 +
         c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
     var distanceInKm = 12742 * asin(sqrt(a));
-    print(distanceInKm);
+    // print(distanceInKm);
     return distanceInKm;
   }
 
@@ -135,31 +184,11 @@ class CombosListView extends StatelessWidget {
         trailing: CircleAvatar(
           radius: 25,
           backgroundColor: Colors.blue,
-          child: Text(formatSeconds(walktime),
+          child: Text(walktime.toString(),
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 15,
               )),
         ),
       );
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Winning Combos'),
-        ),
-        body: FutureBuilder<List<Combo>>(
-          future: _fetchCombos(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              List<Combo>? data = snapshot.data;
-              return _combosListView(data);
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            }
-            return const CircularProgressIndicator();
-          },
-        ));
-  }
 }
