@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:bike_angel_hero/screens/showmap.dart';
 import 'package:bike_angel_hero/services/location.dart';
 import 'package:bike_angel_hero/services/networking.dart';
 import 'package:bike_angel_hero/utilities/constants.dart';
@@ -67,28 +68,58 @@ class _ComboListPageState extends State<ComboListPage> {
             size: iconSize,
           );
     return Scaffold(
+        drawer: Drawer(
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: [
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ),
+                child: Text('Bike Angel Hero'),
+              ),
+              ListTile(
+                title: const Text('Map View'),
+                onTap: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) => ShowMap()));
+                },
+              ),
+              ListTile(
+                title: const Text('List View'),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => ComboListPage()));
+
+                  // ...
+                },
+              ),
+            ],
+          ),
+        ),
         appBar: AppBar(
           title: Text(DateFormat('kk:mm').format(DateTime.now())),
-          leading: GestureDetector(
-            onTap: () {
-              setState(() {});
-            },
-            child: const Icon(
-              Icons.menu, // add custom icons also
-            ),
-          ),
           actions: <Widget>[
             Padding(
-                padding: const EdgeInsets.only(right: 20.0),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {});
-                  },
-                  child: const Icon(
-                    Icons.refresh,
-                    size: 26.0,
+              // Location
+              padding: const EdgeInsets.only(right: 20.0),
+              child: Container(
+                child: Material(
+                  child: InkWell(
+                    child: const Icon(
+                      Icons.refresh,
+                      size: iconSize,
+                    ),
+                    onTap: () {
+                      setState(() {});
+                    },
                   ),
-                )),
+                  color: Colors.transparent,
+                ),
+                color: Colors.transparent,
+              ),
+            ),
             Padding(
               // Location
               padding: const EdgeInsets.only(right: 20.0),
@@ -168,9 +199,10 @@ class _ComboListPageState extends State<ComboListPage> {
 
   String formattedDate = '';
   Future<List<Combo>> _fetchCombos() async {
-    // MyLocation location = MyLocation();
     await location.getCurrentLocation();
-    NetworkHelper networkHelper = NetworkHelper(combosURL);
+    var locationParams = "?lat=${location.latitude}&lon=${location.longitude}";
+    var url = combosURL + (filterByLocation ? locationParams : "");
+    NetworkHelper networkHelper = NetworkHelper(url);
     DateTime now = DateTime.now();
     formattedDate = DateFormat('kk:mm:ss \n EEE d MMM').format(now);
     final response = await networkHelper.getData();
@@ -182,11 +214,14 @@ class _ComboListPageState extends State<ComboListPage> {
         final distanceInMeters = calculateDistance(element['latitude'],
             element['longitude'], location.latitude, location.longitude);
         // print(distanceInMeters);
+        /*
         if (filterByLocation) {
           if (distanceInMeters > nearDistance) {
             jsonResponse.removeAt(i);
           }
         }
+
+         */
       }
 
       return jsonResponse.map((job) => Combo.fromJson(job)).toList();
@@ -243,7 +278,7 @@ class _ComboListPageState extends State<ComboListPage> {
           child: CircleAvatar(
             backgroundColor: Colors.yellowAccent,
             foregroundColor: Colors.red,
-            maxRadius: 25,
+            maxRadius: 22,
             minRadius: 15,
             child: Text(points.toString(),
                 style: const TextStyle(
@@ -259,14 +294,32 @@ class _ComboListPageState extends State<ComboListPage> {
               fontWeight: FontWeight.w500,
               fontSize: 14,
             )),
-        trailing: CircleAvatar(
-          radius: 25,
-          backgroundColor: Colors.blue,
-          child: Text(formatSeconds(walktime),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-              )),
+        trailing: Container(
+          padding: EdgeInsets.only(right: 12.0),
+          decoration: const BoxDecoration(
+              border:
+                  Border(right: BorderSide(width: 1.0, color: Colors.white24))),
+          child: CircleAvatar(
+            backgroundColor: Colors.blueAccent,
+            foregroundColor: Colors.white,
+            maxRadius: 24,
+            minRadius: 15,
+            child: Text(formatSeconds(walktime),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                )),
+          ),
         ),
+        // trailing:
+        // CircleAvatar(
+        //   radius: 28,
+        //   backgroundColor: Colors.blue,
+        //   child: Text(formatSeconds(walktime),
+        //       style: const TextStyle(
+        //         color: Colors.white,
+        //         fontSize: 14,
+        //       )),
+        // ),
       );
 }
