@@ -69,12 +69,12 @@ class _ComboListPageState extends State<ComboListPage> {
           );
     Icon selectedSortIcon = selectedSort == 0
         ? const Icon(
-            Icons.sort_sharp, // Icons.favorite
+            Icons.arrow_circle_up_rounded, // Icons.favorite
             color: Colors.blueAccent, //
             size: iconSize,
           )
         : const Icon(
-            Icons.sort_rounded, // Icons.favorite
+            Icons.arrow_circle_down_rounded, // Icons.favorite
             color: Colors.redAccent, //
             size: iconSize,
           );
@@ -144,12 +144,14 @@ class _ComboListPageState extends State<ComboListPage> {
                         selectedSort = 1;
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text('Sorted by Points, Distance')));
+                                content:
+                                    Text('Sorted by Walking time, Points')));
                       } else {
                         selectedSort = 0;
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text('Sorted by Distance, Points')));
+                                content:
+                                    Text('Sorted by Points, Walking time')));
                       }
                       setState(() {});
                     },
@@ -292,7 +294,7 @@ class _ComboListPageState extends State<ComboListPage> {
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontWeight: FontWeight.w500,
-              fontSize: 14,
+              fontSize: 18,
             )),
         trailing: Container(
           padding: EdgeInsets.only(right: 12.0),
