@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:bike_angel_hero/screens/showmap.dart';
 import 'package:bike_angel_hero/services/location.dart';
 import 'package:bike_angel_hero/services/networking.dart';
 import 'package:bike_angel_hero/utilities/constants.dart';
@@ -14,6 +13,7 @@ const nearDistance = 2; // 2 km
 
 MyLocation location = MyLocation();
 bool filterByLocation = false;
+int selectedSort = 0; // Default sort by points and distance
 
 class Combo {
   late final int points;
@@ -56,7 +56,7 @@ class _ComboListPageState extends State<ComboListPage> {
   static const iconSize = 26.0;
   @override
   Widget build(BuildContext context) {
-    Icon selectedIcon = filterByLocation
+    Icon selectedLocationIcon = filterByLocation
         ? const Icon(
             Icons.location_off, // Icons.favorite
             color: Colors.blueAccent, // Colors.red
@@ -67,42 +67,54 @@ class _ComboListPageState extends State<ComboListPage> {
             color: Colors.blueAccent, // Colors.red
             size: iconSize,
           );
-    return Scaffold(
-        drawer: Drawer(
-          child: ListView(
-            // Important: Remove any padding from the ListView.
-            padding: EdgeInsets.zero,
-            children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-                child: Text('Bike Angel Hero'),
-              ),
-              ListTile(
-                title: const Text('Map View'),
-                onTap: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (context) => ShowMap()));
-                },
-              ),
-              ListTile(
-                title: const Text('List View'),
-                onTap: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ComboListPage()));
+    Icon selectedSortIcon = selectedSort == 0
+        ? const Icon(
+            Icons.sort_sharp, // Icons.favorite
+            color: Colors.blueAccent, //
+            size: iconSize,
+          )
+        : const Icon(
+            Icons.sort_rounded, // Icons.favorite
+            color: Colors.redAccent, //
+            size: iconSize,
+          );
 
-                  // ...
-                },
-              ),
-            ],
-          ),
-        ),
+    return Scaffold(
+        // drawer: Drawer(
+        //   child: ListView(
+        //     // Important: Remove any padding from the ListView.
+        //     padding: EdgeInsets.zero,
+        //     children: [
+        //       const DrawerHeader(
+        //         decoration: BoxDecoration(
+        //           color: Colors.blue,
+        //         ),
+        //         child: Text('Bike Angel Hero'),
+        //       ),
+        //       ListTile(
+        //         title: const Text('Map View'),
+        //         onTap: () {
+        //           Navigator.of(context)
+        //               .push(MaterialPageRoute(builder: (context) => ShowMap()));
+        //         },
+        //       ),
+        //       ListTile(
+        //         title: const Text('List View'),
+        //         onTap: () {
+        //           Navigator.of(context).push(
+        //               MaterialPageRoute(builder: (context) => ComboListPage()));
+        //
+        //           // ...
+        //         },
+        //       ),
+        //     ],
+        //   ),
+        // ),
         appBar: AppBar(
           title: Text(DateFormat('kk:mm').format(DateTime.now())),
           actions: <Widget>[
             Padding(
-              // Location
+              // Refresh
               padding: const EdgeInsets.only(right: 20.0),
               child: Container(
                 child: Material(
@@ -121,25 +133,27 @@ class _ComboListPageState extends State<ComboListPage> {
               ),
             ),
             Padding(
-              // Location
+              // Sort
               padding: const EdgeInsets.only(right: 20.0),
               child: Container(
                 child: Material(
                   child: InkWell(
-                      child: PopupMenuButton(
-                    icon: Icon(Icons.sort),
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        child: Text("Distance, Points"),
-                        value: 1,
-                      ),
-                      PopupMenuItem(
-                        child: Text("Points"),
-                        value: 2,
-                      ),
-                    ],
-                    onSelected: (int index) {},
-                  )),
+                    child: selectedSortIcon,
+                    onTap: () {
+                      if (selectedSort == 0) {
+                        selectedSort = 1;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Sorted by Points, Distance')));
+                      } else {
+                        selectedSort = 0;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Sorted by Distance, Points')));
+                      }
+                      setState(() {});
+                    },
+                  ),
                   color: Colors.transparent,
                 ),
                 color: Colors.transparent,
@@ -151,7 +165,7 @@ class _ComboListPageState extends State<ComboListPage> {
               child: Container(
                 child: Material(
                   child: InkWell(
-                    child: selectedIcon,
+                    child: selectedLocationIcon,
                     onTap: () async {
                       await location.getCurrentLocation();
                       filterByLocation = !filterByLocation;
@@ -200,30 +214,16 @@ class _ComboListPageState extends State<ComboListPage> {
   String formattedDate = '';
   Future<List<Combo>> _fetchCombos() async {
     await location.getCurrentLocation();
-    var locationParams = "?lat=${location.latitude}&lon=${location.longitude}";
-    var url = combosURL + (filterByLocation ? locationParams : "");
+    var locationParams = "&lat=${location.latitude}&lon=${location.longitude}";
+    var url = combosURL +
+        "?sort=${selectedSort}" +
+        (filterByLocation ? locationParams : "");
     NetworkHelper networkHelper = NetworkHelper(url);
     DateTime now = DateTime.now();
     formattedDate = DateFormat('kk:mm:ss \n EEE d MMM').format(now);
     final response = await networkHelper.getData();
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
-
-      for (int i = 0; i < jsonResponse.length; i++) {
-        var element = jsonResponse[i];
-        final distanceInMeters = calculateDistance(element['latitude'],
-            element['longitude'], location.latitude, location.longitude);
-        // print(distanceInMeters);
-        /*
-        if (filterByLocation) {
-          if (distanceInMeters > nearDistance) {
-            jsonResponse.removeAt(i);
-          }
-        }
-
-         */
-      }
-
       return jsonResponse.map((job) => Combo.fromJson(job)).toList();
     } else {
       throw Exception('Failed to load combos from API');
@@ -311,15 +311,5 @@ class _ComboListPageState extends State<ComboListPage> {
                 )),
           ),
         ),
-        // trailing:
-        // CircleAvatar(
-        //   radius: 28,
-        //   backgroundColor: Colors.blue,
-        //   child: Text(formatSeconds(walktime),
-        //       style: const TextStyle(
-        //         color: Colors.white,
-        //         fontSize: 14,
-        //       )),
-        // ),
       );
 }
