@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import 'constants.dart';
@@ -19,11 +21,16 @@ class MapUtils {
       String pickup, String dropoff) async {
     var origin = Uri.encodeComponent("Citi Bike: " + pickup);
     var destination = Uri.encodeComponent("Citi Bike: " + dropoff);
+
     var directionLink = googleMapsDirectionsUrl +
         "&origin=" +
         origin +
         "&destination=" +
         destination;
+    if (Platform.isIOS) {
+      directionLink =
+          appleMapsDirectionsUrl + "&saddr=" + origin + "&daddr=" + destination;
+    }
 
     if (await canLaunch(directionLink)) {
       await launch(directionLink);
