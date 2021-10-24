@@ -2,13 +2,11 @@ import 'dart:convert';
 
 import 'package:bike_angel_hero/services/bikestations.dart';
 import 'package:bike_angel_hero/services/networking.dart';
+import 'package:bike_angel_hero/utilities/constants.dart';
 import 'package:http/http.dart' as http;
 
 const bikeAngelStationsDataURL =
     'https://layer.bicyclesharing.net/map/v1/nyc/stations';
-// const combosURL = "http://192.168.1.123:5000/getappcombos"; // Testing
-const combosURL =
-    "https://bike-angel-hero-server.herokuapp.com/getappcombos"; // Production
 
 class BikeAngelModel {
   Future<BikeStations> fetchBikeStations(http.Client client) async {

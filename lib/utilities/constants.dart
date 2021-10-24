@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 
 const String apiKey = 'a23c8ef65be625d9cb492de9bf53e72f';
 
+const googleMapsDirectionsUrl =
+    "https://www.google.com/maps/dir/?api=1&travelmode=bicycling";
+
+// const combosURL = 'http://192.168.1.123:5000/getappcombos'; // testing
+const combosURL =
+    "https://bike-angel-hero-server.herokuapp.com/getappcombos"; // Production
+
 const kTempTextStyle = TextStyle(
   fontFamily: 'Spartan MB',
   fontSize: 100.0,

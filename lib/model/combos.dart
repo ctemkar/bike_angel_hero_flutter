@@ -4,13 +4,15 @@ import 'dart:math';
 
 import 'package:bike_angel_hero/services/location.dart';
 import 'package:bike_angel_hero/services/networking.dart';
+import 'package:bike_angel_hero/utilities/constants.dart';
+import 'package:bike_angel_hero/utilities/maputils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 const nearDistance = 2; // 2 km
-const combosURL = 'http://192.168.1.123:5000/getappcombos'; // testing
-// const combosURL =
-//    "https://bike-angel-hero-server.herokuapp.com/getappcombos"; // Production
+
+MyLocation location = MyLocation();
+bool filterByLocation = false;
 
 class Combo {
   late final int points;
@@ -50,35 +52,95 @@ class _ComboListPageState extends State<ComboListPage> {
     super.initState();
   }
 
+  static const iconSize = 26.0;
   @override
   Widget build(BuildContext context) {
+    Icon selectedIcon = filterByLocation
+        ? const Icon(
+            Icons.location_off, // Icons.favorite
+            color: Colors.blueAccent, // Colors.red
+            size: iconSize,
+          )
+        : const Icon(
+            Icons.location_on, // Icons.favorite
+            color: Colors.blueAccent, // Colors.red
+            size: iconSize,
+          );
     return Scaffold(
         appBar: AppBar(
-          title: Text("At: " + DateFormat('kk:mm:ss').format(DateTime.now())),
+          title: Text(DateFormat('kk:mm').format(DateTime.now())),
           leading: GestureDetector(
             onTap: () {
               setState(() {});
             },
-            child: Icon(
+            child: const Icon(
               Icons.menu, // add custom icons also
             ),
           ),
           actions: <Widget>[
             Padding(
-                padding: EdgeInsets.only(right: 20.0),
+                padding: const EdgeInsets.only(right: 20.0),
                 child: GestureDetector(
-                  onTap: () {},
-                  child: Icon(
-                    Icons.search,
+                  onTap: () {
+                    setState(() {});
+                  },
+                  child: const Icon(
+                    Icons.refresh,
                     size: 26.0,
                   ),
                 )),
             Padding(
-                padding: EdgeInsets.only(right: 20.0),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Icon(Icons.more_vert),
-                )),
+              // Location
+              padding: const EdgeInsets.only(right: 20.0),
+              child: Container(
+                child: Material(
+                  child: InkWell(
+                      child: PopupMenuButton(
+                    icon: Icon(Icons.sort),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        child: Text("Distance, Points"),
+                        value: 1,
+                      ),
+                      PopupMenuItem(
+                        child: Text("Points"),
+                        value: 2,
+                      ),
+                    ],
+                    onSelected: (int index) {},
+                  )),
+                  color: Colors.transparent,
+                ),
+                color: Colors.transparent,
+              ),
+            ),
+            Padding(
+              // Location
+              padding: const EdgeInsets.only(right: 20.0),
+              child: Container(
+                child: Material(
+                  child: InkWell(
+                    child: selectedIcon,
+                    onTap: () async {
+                      await location.getCurrentLocation();
+                      filterByLocation = !filterByLocation;
+                      if (filterByLocation) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Showing places close to you')));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Showing everything')));
+                      }
+                      setState(() {});
+                    },
+                  ),
+                  color: Colors.transparent,
+                ),
+                color: Colors.transparent,
+              ),
+            ),
           ],
         ),
         body: FutureBuilder<List<Combo>>(
@@ -106,7 +168,7 @@ class _ComboListPageState extends State<ComboListPage> {
 
   String formattedDate = '';
   Future<List<Combo>> _fetchCombos() async {
-    MyLocation location = MyLocation();
+    // MyLocation location = MyLocation();
     await location.getCurrentLocation();
     NetworkHelper networkHelper = NetworkHelper(combosURL);
     DateTime now = DateTime.now();
@@ -120,8 +182,10 @@ class _ComboListPageState extends State<ComboListPage> {
         final distanceInMeters = calculateDistance(element['latitude'],
             element['longitude'], location.latitude, location.longitude);
         // print(distanceInMeters);
-        if (distanceInMeters > nearDistance) {
-          //     jsonResponse.removeAt(i);
+        if (filterByLocation) {
+          if (distanceInMeters > nearDistance) {
+            jsonResponse.removeAt(i);
+          }
         }
       }
 
@@ -167,24 +231,38 @@ class _ComboListPageState extends State<ComboListPage> {
   ListTile _tile(int points, int distance, int walktime, String pickupStation,
           String dropoffStation) =>
       ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.yellowAccent,
-          child: Text(points.toString(),
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w500,
-                fontSize: 20,
-              )),
+        onTap: () {
+          MapUtils.openMapWithDirections(pickupStation, dropoffStation);
+        },
+        contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+        leading: Container(
+          padding: EdgeInsets.only(right: 12.0),
+          decoration: const BoxDecoration(
+              border:
+                  Border(right: BorderSide(width: 1.0, color: Colors.white24))),
+          child: CircleAvatar(
+            backgroundColor: Colors.yellowAccent,
+            foregroundColor: Colors.red,
+            maxRadius: 25,
+            minRadius: 15,
+            child: Text(points.toString(),
+                style: const TextStyle(
+                  // color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                )),
+          ),
         ),
         title: Text(pickupStation + ' \n' + dropoffStation,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               fontWeight: FontWeight.w500,
-              fontSize: 18,
+              fontSize: 14,
             )),
         trailing: CircleAvatar(
           radius: 25,
           backgroundColor: Colors.blue,
-          child: Text(walktime.toString(),
+          child: Text(formatSeconds(walktime),
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 15,
