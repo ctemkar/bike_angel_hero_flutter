@@ -2,8 +2,8 @@
     package="com.smartshehar.bike_angel_hero">
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
    <application
-        android:label="bike_angel_hero"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Bike Angel Hero"
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

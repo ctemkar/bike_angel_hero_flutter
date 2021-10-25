@@ -169,6 +169,7 @@ class _ComboListPageState extends State<ComboListPage> {
                   child: InkWell(
                     child: selectedLocationIcon,
                     onTap: () async {
+                      location = MyLocation();
                       await location.getCurrentLocation();
                       filterByLocation = !filterByLocation;
                       if (filterByLocation) {
@@ -215,8 +216,11 @@ class _ComboListPageState extends State<ComboListPage> {
 
   String formattedDate = '';
   Future<List<Combo>> _fetchCombos() async {
-    await location.getCurrentLocation();
-    var locationParams = "&lat=${location.latitude}&lon=${location.longitude}";
+    var locationParams = '';
+    try {
+      await location.getCurrentLocation();
+      locationParams = "&lat=${location.latitude}&lon=${location.longitude}";
+    } catch (e) {}
     var url = combosURL +
         "?sort=${selectedSort}" +
         (filterByLocation ? locationParams : "");
@@ -294,7 +298,7 @@ class _ComboListPageState extends State<ComboListPage> {
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontWeight: FontWeight.w500,
-              fontSize: 18,
+              fontSize: 16,
             )),
         trailing: Container(
           padding: EdgeInsets.only(right: 12.0),
