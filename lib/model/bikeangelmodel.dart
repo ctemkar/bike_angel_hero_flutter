@@ -21,7 +21,6 @@ class BikeAngelModel {
     return resp;
   }
 
-  // A function that converts a response body into a List<Photo>.
   List<BikeStations> parseBikeStations(String responseBody) {
     try {
       final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();

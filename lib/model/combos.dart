@@ -2,14 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:bike_angel_hero/screens/showmap.dart';
 import 'package:bike_angel_hero/services/location.dart';
 import 'package:bike_angel_hero/services/networking.dart';
 import 'package:bike_angel_hero/utilities/constants.dart';
 import 'package:bike_angel_hero/utilities/maputils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-const nearDistance = 2; // 2 km
 
 MyLocation location = MyLocation();
 bool filterByLocation = false;
@@ -80,36 +80,36 @@ class _ComboListPageState extends State<ComboListPage> {
           );
 
     return Scaffold(
-        // drawer: Drawer(
-        //   child: ListView(
-        //     // Important: Remove any padding from the ListView.
-        //     padding: EdgeInsets.zero,
-        //     children: [
-        //       const DrawerHeader(
-        //         decoration: BoxDecoration(
-        //           color: Colors.blue,
-        //         ),
-        //         child: Text('Bike Angel Hero'),
-        //       ),
-        //       ListTile(
-        //         title: const Text('Map View'),
-        //         onTap: () {
-        //           Navigator.of(context)
-        //               .push(MaterialPageRoute(builder: (context) => ShowMap()));
-        //         },
-        //       ),
-        //       ListTile(
-        //         title: const Text('List View'),
-        //         onTap: () {
-        //           Navigator.of(context).push(
-        //               MaterialPageRoute(builder: (context) => ComboListPage()));
-        //
-        //           // ...
-        //         },
-        //       ),
-        //     ],
-        //   ),
-        // ),
+        drawer: Drawer(
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: [
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ),
+                child: Text('Bike Angel Hero'),
+              ),
+              ListTile(
+                title: const Text('Map View'),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const ShowMap()));
+                },
+              ),
+              ListTile(
+                title: const Text('List View'),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const ComboListPage()));
+
+                  // ...
+                },
+              ),
+            ],
+          ),
+        ),
         appBar: AppBar(
           title: Text(DateFormat('kk:mm').format(DateTime.now())),
           actions: <Widget>[
@@ -220,9 +220,13 @@ class _ComboListPageState extends State<ComboListPage> {
     try {
       await location.getCurrentLocation();
       locationParams = "&lat=${location.latitude}&lon=${location.longitude}";
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) {
+        print("Location problem" + e.toString());
+      }
+    }
     var url = combosURL +
-        "?sort=${selectedSort}" +
+        "?sort=$selectedSort" +
         (filterByLocation ? locationParams : "");
     NetworkHelper networkHelper = NetworkHelper(url);
     DateTime now = DateTime.now();
@@ -275,9 +279,10 @@ class _ComboListPageState extends State<ComboListPage> {
         onTap: () {
           MapUtils.openMapWithDirections(pickupStation, dropoffStation);
         },
-        contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
         leading: Container(
-          padding: EdgeInsets.only(right: 12.0),
+          padding: const EdgeInsets.only(right: 12.0),
           decoration: const BoxDecoration(
               border:
                   Border(right: BorderSide(width: 1.0, color: Colors.white24))),
@@ -301,7 +306,7 @@ class _ComboListPageState extends State<ComboListPage> {
               fontSize: 16,
             )),
         trailing: Container(
-          padding: EdgeInsets.only(right: 12.0),
+          padding: const EdgeInsets.only(right: 12.0),
           decoration: const BoxDecoration(
               border:
                   Border(right: BorderSide(width: 1.0, color: Colors.white24))),

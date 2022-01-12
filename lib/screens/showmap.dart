@@ -159,7 +159,7 @@ class _ShowMapState extends State<ShowMap> {
   }
 
   bool isNearMe(double lat, double lon) {
-    if ((latitude - lat).abs() < .1 && (longitude - lon).abs() < .1) {
+    if ((latitude - lat).abs() < .01 && (longitude - lon).abs() < .01) {
       // count++;
       return true;
     }

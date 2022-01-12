@@ -21,7 +21,7 @@ class MapUtils {
       String pickup, String dropoff) async {
     var origin = Uri.encodeComponent("Citi Bike: " + pickup);
     var destination = Uri.encodeComponent("Citi Bike: " + dropoff);
-    var directionLinkIOS = '';
+    // var directionLinkIOS = '';
     var directionLink = googleMapsDirectionsUrl +
         "&origin=" +
         origin +

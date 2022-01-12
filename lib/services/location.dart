@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:location/location.dart';
 
 class MyLocation {
@@ -28,7 +29,9 @@ class MyLocation {
         }
       }
     } catch (err) {
-      print("Platform exception calling serviceEnabled(): $err");
+      if (kDebugMode) {
+        print("Platform exception calling serviceEnabled(): $err");
+      }
       _serviceEnabled = false;
     }
     try {
