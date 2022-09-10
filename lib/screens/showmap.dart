@@ -50,7 +50,7 @@ class _ShowMapState extends State<ShowMap> {
 
     var stationList = bikeStations.features;
     final Uint8List markerIcon = await getBytesFromCanvas(
-        200, 200, 0, Colors.black26, Colors.white, false);
+        400, 400, 0, Colors.black26, Colors.white, false);
 
     _markers.clear();
     // _markers.add(marker);
@@ -69,6 +69,14 @@ class _ShowMapState extends State<ShowMap> {
       double lat = station.geometry.coordinates[1];
       double lon = station.geometry.coordinates[0];
       String streetName = station.properties.name;
+/*
+      if (bikeAngelPoints != null) {
+        if(bikeAngelPoints < 0) {
+          continue;
+        }
+      }
+
+*/
       if (bikeAngelsAction != null && visibleRegion.contains(LatLng(lat, lon)))
       //isNearMe(station.geometry.coordinates[1],
       // station.geometry.coordinates[0]))
@@ -103,7 +111,8 @@ class _ShowMapState extends State<ShowMap> {
           case 0:
             {
               textColor = Colors.black54;
-              color = Colors.green;
+              // color = Colors.green;
+              color = Colors.white;
             }
             break;
 
@@ -136,7 +145,7 @@ class _ShowMapState extends State<ShowMap> {
             break;
         }
         final Uint8List markerIcon = await getBytesFromCanvas(
-            200, 100, bikeAngelPoints, color, textColor, hasBigPoints);
+            400, 200, bikeAngelPoints, color, textColor, hasBigPoints);
         myIcon = BitmapDescriptor.fromBytes(markerIcon);
 
         final marker = Marker(
@@ -149,7 +158,11 @@ class _ShowMapState extends State<ShowMap> {
           ),
         );
         setState(() {
-          _markers[count.toString()] = marker;
+          print(bikeAngelPoints);
+          if(bikeAngelPoints >= 0) {
+            _markers[count.toString()] = marker;
+          }
+
         });
         count++;
       }
@@ -173,17 +186,18 @@ class _ShowMapState extends State<ShowMap> {
       Color color,
       Color textColor,
       bool hasBigPoints) async {
+    // color = Colors.white;
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
     final Paint paint = Paint()..color = color;
-    const Radius radius = Radius.circular(5.0);
+    const Radius radius = Radius.circular(10.0);
     // width = 150;
     // height = 150;
-    const textFontSize = 35.0;
+    const textFontSize = 72.0;
     int arrowCodePoint;
 
     var zoomLevel = await _controller.getZoomLevel();
-    width = (zoomLevel * 7).toInt();
+    width = (zoomLevel * 12).toInt();
     height = width ~/ 2;
     TextStyle textStyleOut = TextStyle(
         fontSize: textFontSize,
